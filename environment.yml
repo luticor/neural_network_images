@@ -1,0 +1,10 @@
+name: neural_net_images
+
+dependencies:
+  - python
+  - numpy
+  - pytorch
+  - matplotlib
+  - pandas
+  - pip:
+    - git+https://github.com/luticor/neural_network_images.git
