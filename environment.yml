@@ -6,5 +6,7 @@ dependencies:
   - pytorch
   - matplotlib
   - pandas
+  - mamba
+  - tqdm
   - pip:
     - git+https://github.com/luticor/neural_network_images.git
