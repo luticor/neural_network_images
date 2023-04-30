@@ -30,11 +30,11 @@ class NeuralNetworkTrainer:
     def train(self, plot=True):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.net.to(device)
-        self.criterion = nn.MSELoss()
-        self.optimizer = optim.Adam(self.net.parameters(), lr=self.lr).to(device)
+        criterion = nn.MSELoss()
+        optimizer = optim.Adam(self.net.parameters(), lr=self.lr)
         for epoch in range(self.n_epochs):
             if self.lr_schedule=='auto' or self.lr_schedule is None:
-                for g in self.optimizer.param_groups:
+                for g in optimizer.param_groups:
                     g['lr'] = 10**(self.lr_exp - 2.*(epoch/(self.n_epochs-1)))
             elif  self.lr_schedule=='fixed':
                 pass
@@ -45,11 +45,11 @@ class NeuralNetworkTrainer:
                 y_batch = y_batch.to(device)
                 # Forward pass
                 outputs = self.net(x_batch)
-                loss = self.criterion(outputs, y_batch.unsqueeze(dim=-1))
+                loss = criterion(outputs, y_batch.unsqueeze(dim=-1))
                 # Backward pass and optimization
-                self.optimizer.zero_grad()
+                optimizer.zero_grad()
                 loss.backward()
-                self.optimizer.step()
+                optimizer.step()
 
                 # Store the loss value
                 self.loss_values.append(loss.cpu().item())
@@ -89,7 +89,6 @@ class NeuralNetworkTrainer:
             file_path = f"working/model_{date_string}.pickle"
         # Send the model and optimizer back to CPU if they are on GPU
         self.net.cpu()
-        self.optimizer.cpu()
         with open(file_path, 'wb') as f:
             pickle.dump(self, f)
 
