@@ -25,11 +25,13 @@ class NeuralNetworkTrainer:
         self.lr_exp = np.log10(lr)
         self.lr_schedule = lr_schedule
         self.plot_func = plot_func
-        self.criterion = nn.MSELoss()
-        self.optimizer = optim.Adam(self.net.parameters(), lr=lr)
         self.loss_values = []
 
     def train(self, plot=True):
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.net.to(device)
+        self.criterion = nn.MSELoss()
+        self.optimizer = optim.Adam(self.net.parameters(), lr=self.lr).to(device)
         for epoch in range(self.n_epochs):
             if self.lr_schedule=='auto' or self.lr_schedule is None:
                 for g in self.optimizer.param_groups:
@@ -39,6 +41,8 @@ class NeuralNetworkTrainer:
             print('Epoch', epoch, 'of', self.n_epochs)
             loop = tqdm(self.dataloader, leave=True)
             for x_batch, y_batch in loop:
+                x_batch = x_batch.to(device)
+                y_batch = y_batch.to(device)
                 # Forward pass
                 outputs = self.net(x_batch)
                 loss = self.criterion(outputs, y_batch.unsqueeze(dim=-1))
@@ -48,13 +52,13 @@ class NeuralNetworkTrainer:
                 self.optimizer.step()
 
                 # Store the loss value
-                self.loss_values.append(loss.item())
+                self.loss_values.append(loss.cpu().item())
 
             # Print the loss
             print(f"Loss = {self.loss_values[-1]}")
             if plot:
                 # Show current network progress
-                if epoch in [0,1,2,4,7,10,20,40]:
+                if epoch in [0,1,3,6,9,19,39]:
                     self.plot_output()
 
     def plot_output(self):
@@ -75,6 +79,7 @@ class NeuralNetworkTrainer:
         plt.show()
 
     def save_model(self, file_path):
+        self.net.cpu()
         torch.save(self.net.state_dict(), file_path)
 
     def save_trainer(self, file_path=None):
@@ -82,6 +87,9 @@ class NeuralNetworkTrainer:
             now = datetime.datetime.now()
             date_string = now.strftime("%m%d_%H%M")
             file_path = f"working/model_{date_string}.pickle"
+        # Send the model and optimizer back to CPU if they are on GPU
+        self.net.cpu()
+        self.optimizer.cpu()
         with open(file_path, 'wb') as f:
             pickle.dump(self, f)
 

@@ -62,6 +62,7 @@ def df_to_dataloader(df, batch_size = 1024, shuffle=True, verbose=True):
 
 
 def plot_performance(net, scale=8, batch_size=64, width = 1920, height = 1080):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     #Custom function to plot results of image learning.
     xlin = np.linspace(0, 1, width // scale)
     ylin = np.linspace(0, 1, height // scale)
@@ -73,12 +74,13 @@ def plot_performance(net, scale=8, batch_size=64, width = 1920, height = 1080):
     reduced_tensor = torch.stack((xv_tensor, yv_tensor), dim=-1)
     reduced_dataset = TensorDataset(reduced_tensor, torch.zeros(size=(len(reduced_tensor), 1)))
     reduced_dataloader = DataLoader(reduced_dataset, batch_size=batch_size, shuffle=False)
-
+    net.to(device)
     with torch.no_grad():
         output_list = []
         for x_batch, _ in reduced_dataloader:
+            x_batch = x_batch.to(device)
             outputs = net(x_batch)
-            output_list.append(outputs)
+            output_list.append(outputs.cpu())
 
         outputs = torch.cat(output_list, dim=0).numpy()
         
