@@ -4,7 +4,6 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 import matplotlib
-import os
 import pickle
 import datetime
 
@@ -31,7 +30,7 @@ class NeuralNetworkTrainer:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.net.to(device)
         criterion = nn.MSELoss()
-        optimizer = optim.Adam(self.net.parameters(), lr=self.lr).to(device)
+        optimizer = optim.Adam(self.net.parameters(), lr=self.lr)
         for epoch in range(self.n_epochs):
             if self.lr_schedule=='auto' or self.lr_schedule is None:
                 for g in optimizer.param_groups:
