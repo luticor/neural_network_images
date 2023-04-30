@@ -59,7 +59,7 @@ class NeuralNetworkTrainer:
             print(f"Loss = {self.loss_values[-1]}")
             if plot:
                 # Show current network progress
-                if epoch in [0,1,2,3,6,9,19,39]:
+                if epoch in [0,1,2,3,5,9,19,39]:
                     self.plot_output()
                     self.checkpoint_models.append(copy.deepcopy(self.net).cpu())
 

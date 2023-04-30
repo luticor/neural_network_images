@@ -40,12 +40,13 @@ class Net_With_Sigmoid(Net):
 
 # Define the neural network architecture
 class ResNet(nn.Module):
-    def __init__(self, nn_shape=(2, 4, 100, 1)):
+    def __init__(self, nn_shape=(2, 4, 100, 1), resnet_skip=2):
         super(ResNet, self).__init__()
         self.num_inputs = nn_shape[0]
         self.num_layers = nn_shape[1]
         self.num_neurons = nn_shape[2]
         self.num_outputs = nn_shape[3]
+        self.resnet_skip = resnet_skip
         self.layers = nn.ModuleList() # create an empty list to store layers
         self.layers.append(nn.Linear(self.num_inputs, self.num_neurons)) # add the first layer
         
@@ -58,7 +59,7 @@ class ResNet(nn.Module):
         skip_connection = F.relu(self.layers[0](x))
         for idx in range(len(self.layers)-1):
             x = F.relu(self.layers[idx](x))
-            if idx % 2 == 1: #Add skip connection to every other layer
+            if idx % self.resnet_skip == 1: #Add skip connection to every other layer
                 x = x + skip_connection
                 skip_connection = x
         x = self.layers[-1](x)
