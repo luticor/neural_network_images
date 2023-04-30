@@ -5,12 +5,13 @@ import torch.nn.functional as F
 
 # Define the neural network architecture
 class Net(nn.Module):
-    def __init__(self, nn_shape=(2, 4, 100, 1)):
+    def __init__(self, nn_shape=(2, 4, 100, 1), activation=F.relu):
         super(Net, self).__init__()
         self.num_inputs = nn_shape[0]
         self.num_layers = nn_shape[1]
         self.num_neurons = nn_shape[2]
         self.num_outputs = nn_shape[3]
+        self.activation = activation
         self.layers = nn.ModuleList() # create an empty list to store layers
         self.layers.append(nn.Linear(self.num_inputs, self.num_neurons)) # add the first layer
         
@@ -29,8 +30,8 @@ class Net(nn.Module):
 
 
 class Net_With_Sigmoid(Net):
-    def __init__(self, nn_shape=(2, 4, 100, 1)):
-        super().__init__(nn_shape)
+    def __init__(self, nn_shape=(2, 4, 100, 1), activation=F.relu):
+        super().__init__(nn_shape, activation)
 
     def forward(self, x):
         x = super().forward(x)
@@ -40,13 +41,14 @@ class Net_With_Sigmoid(Net):
 
 # Define the neural network architecture
 class ResNet(nn.Module):
-    def __init__(self, nn_shape=(2, 4, 100, 1), resnet_skip=2):
+    def __init__(self, nn_shape=(2, 4, 100, 1), resnet_skip=2, activation=F.relu):
         super(ResNet, self).__init__()
         self.num_inputs = nn_shape[0]
         self.num_layers = nn_shape[1]
         self.num_neurons = nn_shape[2]
         self.num_outputs = nn_shape[3]
         self.resnet_skip = resnet_skip
+        self.activation = activation
         self.layers = nn.ModuleList() # create an empty list to store layers
         self.layers.append(nn.Linear(self.num_inputs, self.num_neurons)) # add the first layer
         
@@ -56,9 +58,9 @@ class ResNet(nn.Module):
         self.layers.append(nn.Linear(self.num_neurons, self.num_outputs)) # add the output layer
 
     def forward(self, x):
-        skip_connection = F.relu(self.layers[0](x))
+        skip_connection = self.activation(self.layers[0](x))
         for idx in range(len(self.layers)-1):
-            x = F.relu(self.layers[idx](x))
+            x = self.activation(self.layers[idx](x))
             if idx % self.resnet_skip == 1: #Add skip connection to every other layer
                 x = x + skip_connection
                 skip_connection = x
@@ -67,8 +69,8 @@ class ResNet(nn.Module):
     
 
 class ResNet_With_Sigmoid(ResNet):
-    def __init__(self, nn_shape=(2, 4, 100, 1), resnet_skip=2):
-        super().__init__(nn_shape, resnet_skip=resnet_skip)
+    def __init__(self, nn_shape=(2, 4, 100, 1), resnet_skip=2, activation=F.relu):
+        super().__init__(nn_shape, resnet_skip=resnet_skip, activation=activation)
 
     def forward(self, x):
         x = super().forward(x)
