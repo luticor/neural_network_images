@@ -6,6 +6,7 @@ from tqdm import tqdm
 import matplotlib
 import pickle
 import datetime
+import copy
 
 # if "DISPLAY" not in os.environ:
 #     matplotlib.use("Agg")  # Use non-interactive backend for scripts running without a display
@@ -25,6 +26,7 @@ class NeuralNetworkTrainer:
         self.lr_schedule = lr_schedule
         self.plot_func = plot_func
         self.loss_values = []
+        self.checkpoint_models = []
 
     def train(self, plot=True):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -57,8 +59,9 @@ class NeuralNetworkTrainer:
             print(f"Loss = {self.loss_values[-1]}")
             if plot:
                 # Show current network progress
-                if epoch in [0,1,3,6,9,19,39]:
+                if epoch in [0,1,2,3,6,9,19,39]:
                     self.plot_output()
+                    self.checkpoint_models.append(copy.deepcopy(self.net).cpu())
 
     def plot_output(self):
         # Call plot function if it is defined
