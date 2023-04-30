@@ -68,7 +68,7 @@ class ResNet(nn.Module):
 
 class ResNet_With_Sigmoid(ResNet):
     def __init__(self, nn_shape=(2, 4, 100, 1), resnet_skip=2):
-        super().__init__(nn_shape), resnet_skip=resnet_skip
+        super().__init__(nn_shape, resnet_skip=resnet_skip)
 
     def forward(self, x):
         x = super().forward(x)
