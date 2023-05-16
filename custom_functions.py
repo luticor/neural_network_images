@@ -70,7 +70,7 @@ def plot_performance(net, scale=8, batch_size=64, width = 1920, height = 1080):
 
     xv_tensor = torch.tensor(xv, dtype=torch.float)
     dims = xv_tensor.size()[0:2]
-    xv_tensor.flatten()
+    xv_tensor = xv_tensor.flatten()
     yv_tensor = torch.tensor(yv, dtype=torch.float).flatten()
 
     reduced_tensor = torch.stack((xv_tensor, yv_tensor), dim=-1)
