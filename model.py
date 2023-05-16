@@ -95,8 +95,8 @@ class Wide_Model(nn.Module):
                                   resnet_skip=self.resnet_skip, activation=self.activation)
 
     def forward(self, x):
-        nx = x.size[0]
+        nx = x.size()[0]
         expanded_param = self.wide_input.expand(nx, -1)
         wide_x = torch.cat((x, expanded_param), dim=1)
-        y = self.net(wide_x)
+        y = self.net.forward(wide_x)
         return y
