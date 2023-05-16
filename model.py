@@ -97,6 +97,7 @@ class Wide_Model(nn.Module):
     def forward(self, x):
         nx = x.size()[0]
         expanded_param = self.wide_input.expand(nx, -1)
+        # print('Model: x.size, expanded_param.size()', x.size(), expanded_param.size())
         wide_x = torch.cat((x, expanded_param), dim=1)
         y = self.net.forward(wide_x)
         return y

@@ -68,11 +68,12 @@ def plot_performance(net, scale=8, batch_size=64, width = 1920, height = 1080):
     ylin = np.linspace(0, 1, height // scale)
     xv, yv = np.meshgrid(xlin, ylin)
 
-    xv_tensor = torch.tensor(xv, dtype=torch.float)
-    yv_tensor = torch.tensor(yv, dtype=torch.float)
+    xv_tensor = torch.tensor(xv, dtype=torch.float).flatten()
+    yv_tensor = torch.tensor(yv, dtype=torch.float).flatten()
 
     reduced_tensor = torch.stack((xv_tensor, yv_tensor), dim=-1)
-    reduced_dataset = TensorDataset(reduced_tensor, torch.zeros(size=(len(reduced_tensor), 1)))
+    # print('custom_functions: reduced_tensor, zeros', reduced_tensor.size(), torch.zeros(size=(reduced_tensor.size()[0], 1)).size())
+    reduced_dataset = TensorDataset(reduced_tensor, torch.zeros(size=(reduced_tensor.size()[0], 1)))
     reduced_dataloader = DataLoader(reduced_dataset, batch_size=batch_size, shuffle=False)
     net.to(device)
     with torch.no_grad():
