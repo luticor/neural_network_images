@@ -68,7 +68,9 @@ def plot_performance(net, scale=8, batch_size=64, width = 1920, height = 1080):
     ylin = np.linspace(0, 1, height // scale)
     xv, yv = np.meshgrid(xlin, ylin)
 
-    xv_tensor = torch.tensor(xv, dtype=torch.float).flatten()
+    xv_tensor = torch.tensor(xv, dtype=torch.float)
+    dims = xv_tensor.size()[0:2]
+    xv_tensor.flatten()
     yv_tensor = torch.tensor(yv, dtype=torch.float).flatten()
 
     reduced_tensor = torch.stack((xv_tensor, yv_tensor), dim=-1)
@@ -84,7 +86,8 @@ def plot_performance(net, scale=8, batch_size=64, width = 1920, height = 1080):
             output_list.append(outputs.cpu())
 
         outputs = torch.cat(output_list, dim=0).numpy()
-        
+    
+    outputs = np.reshape(outputs, dims)
     plt.figure(figsize=(12, 8))
     plt.imshow(outputs, cmap='Greys_r', origin='lower')
     plt.show()
