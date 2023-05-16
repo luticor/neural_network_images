@@ -76,3 +76,27 @@ class ResNet_With_Sigmoid(ResNet):
         x = super().forward(x)
         x = torch.sigmoid(x)
         return (x)
+    
+
+class Wide_Model(nn.Module):
+    def __init__(self, nn_shape=(2, 20, 100, 1), wide_layer = 400, resnet_skip=2, activation=F.relu):
+        super(Wide_Model, self).__init__()
+        self.image_input_size = nn_shape[0]
+        self.num_inputs = wide_layer
+        self.num_layers = nn_shape[1]
+        self.num_neurons = nn_shape[2]
+        self.num_outputs = nn_shape[3]
+        self.activation = activation
+        self.resnet_skip = resnet_skip
+        input_size = 400
+        self.wide_input = torch.nn.parameter.Parameter(torch.randn(1, input_size-self.image_input_size))
+
+        self.net = ResNet_With_Sigmoid(nn_shape=(input_size,self.num_layers, self.num_neurons, self.num_outputs), 
+                                  resnet_skip=self.resnet_skip, activation=self.activation)
+
+    def forward(self, x):
+        nx = x.size[0]
+        expanded_param = self.wide_input.expand(nx, -1)
+        wide_x = torch.cat((x, expanded_param), dim=1)
+        y = self.net(wide_x)
+        return y
